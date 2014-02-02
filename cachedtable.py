@@ -37,6 +37,8 @@ class TableEditor(QtGui.QDialog):
         self.model.setEditStrategy(QtSql.QSqlTableModel.OnManualSubmit)
         self.model.select()
 
+        self.emptyRecord = QtSql.QSqlRecord()
+
         self.model.setHeaderData(0, QtCore.Qt.Horizontal, "ID")
         self.model.setHeaderData(1, QtCore.Qt.Horizontal, "First name")
         self.model.setHeaderData(2, QtCore.Qt.Horizontal, "Last name")
@@ -46,15 +48,18 @@ class TableEditor(QtGui.QDialog):
 
         submitButton = QtGui.QPushButton("Submit")
         submitButton.setDefault(True)
+        addRecButton = QtGui.QPushButton("Add Rec")
         revertButton = QtGui.QPushButton("&Revert")
         quitButton = QtGui.QPushButton("Quit")
 
         buttonBox = QtGui.QDialogButtonBox(QtCore.Qt.Vertical)
         buttonBox.addButton(submitButton, QtGui.QDialogButtonBox.ActionRole)
+        buttonBox.addButton(addRecButton, QtGui.QDialogButtonBox.ActionRole)
         buttonBox.addButton(revertButton, QtGui.QDialogButtonBox.ActionRole)
         buttonBox.addButton(quitButton, QtGui.QDialogButtonBox.RejectRole)
 
         submitButton.clicked.connect(self.submit)
+        addRecButton.clicked.connect(self.addEmptyRec)
         revertButton.clicked.connect(self.model.revertAll)
         quitButton.clicked.connect(self.close)
 
@@ -64,6 +69,9 @@ class TableEditor(QtGui.QDialog):
         self.setLayout(mainLayout)
 
         self.setWindowTitle("Cached Table")
+
+    def addEmptyRec(self):
+        self.model.insertRecord(-1, self.emptyRecord)
 
     def submit(self):
         self.model.database().transaction()  # .database returns a QSqlDatabase thing
